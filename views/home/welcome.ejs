@@ -2,6 +2,15 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    
+    <script>
+      $(document).ready(function(){
+         $('.bxslider').bxSlider({
+           auto: true,
+           autoControls: true
+         }); 
+     });
+     </script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -12,6 +21,12 @@
         <h1>My Website</h1>
         <P>Welcome My website</p>
       </div>
+  
+    <ul class="bxslider"> 
+        <% imgFileList.forEach(function(imgFile) { %>
+          <li><img src = "../../mainImg/<%= imgFile %>" alt="Imgerror"></li> 
+        <% }) %>
+      </ul>
 
     </div>
   </body>

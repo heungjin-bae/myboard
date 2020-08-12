@@ -1,13 +1,17 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('../config/passport');
+var fs = require('fs');
 
 // Home
 router.get('/', function(req, res){
-  res.render('home/welcome');
+  fs.readdir('./mainImg', function(err, imgFileList){
+    res.render('home/welcome',{imgFileList:imgFileList});
+    console.log(imgFileList);
+  });
 });
-router.get('/about', function(req, res){
-  res.render('home/about');
+router.get('/gallery', function(req, res){
+  res.render('home/gallery');
 });
 
 // Login
