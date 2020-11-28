@@ -10,11 +10,13 @@ router.get('/', async function(req, res){
   var limit = Math.max(1, parseInt(req.query.limit));
   page = !isNaN(page)?page:1;
   limit = !isNaN(limit)?limit:10;  
+
+  var searchQuery = createSearchQuery(req.query);
   
   var skip = (page-1)*limit;
-  var count = await Post.countDocuments({});
+  var count = await Post.countDocuments(searchQuery);
   var maxPage = Math.ceil(count/limit);
-  var posts = await Post.find({})
+  var posts = await Post.find(searchQuery)
     .populate('author')              
     .sort('-createdAt')            
     .skip(skip)
@@ -25,7 +27,9 @@ router.get('/', async function(req, res){
       posts:posts,
       currentPage:page,
       maxPage:maxPage,
-      limit:limit
+      limit:limit,
+      searchType:req.query.searchType,
+      searchText:req.query.searchText  
     });
 });
 
@@ -45,7 +49,7 @@ router.post('/', util.isLoggedin, function(req, res){
       req.flash('errors',util.parseError(err));
       return res.redirect('/posts/new'+res.locals.getPostQueryString());
     } 
-    res.redirect('/posts'+res.locals.getPostQueryString(false, {page:1}));
+    res.redirect('/posts'+res.locals.getPostQueryString(false, {page:1,searchText:''}));
   });
 });
 
@@ -103,6 +107,23 @@ function checkPermission(req, res, next){
 
     next();
   });
+}
+
+function createSearchQuery(queries){
+  var searchQuery = {};
+  if(queries.searchType && queries.searchText && queries.searchText.length >= 3){
+    var searchTypes = queries.searchType.toLowerCase().split(',');
+    var postQueries = [];
+    if(searchTypes.indexOf('title')>=0){
+      postQueries.push({ title: { $regex: new RegExp(queries.searchText, 'i') } }); 
+    }
+    if(searchTypes.indexOf('body')>=0){
+      postQueries.push({ body: { $regex: new RegExp(queries.searchText, 'i') } });
+    }
+    if(postQueries.length > 0) searchQuery = {$or:postQueries}; 
+  }
+
+  return searchQuery;
 }
 
 module.exports = router;
