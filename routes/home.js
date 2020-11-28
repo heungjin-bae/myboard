@@ -7,7 +7,6 @@ var fs = require('fs');
 router.get('/', function(req, res){
   fs.readdir('./mainImg', function(err, imgFileList){
     res.render('home/welcome',{imgFileList:imgFileList});
-    console.log(imgFileList);
   });
 });
 router.get('/gallery', function(req, res){

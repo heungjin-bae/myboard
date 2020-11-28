@@ -28,7 +28,7 @@ router.post('/', function(req, res){
       req.flash('errors', util.parseError(err));
       return res.redirect('/users/new');
     }
-    res.redirect('/users');
+    res.redirect('/login');
   });
 });
 
@@ -82,12 +82,12 @@ router.put('/:username', util.isLoggedin, checkPermission, function(req, res, ne
 });
 
 // destroy
-//router.delete('/:username', function(req, res){
-//  User.deleteOne({username:req.params.username}, function(err){
-//    if(err) return res.json(err);
-//    res.redirect('/users');
-//  });
-//});
+router.delete('/:username', function(req, res){
+  User.deleteOne({username:req.params.username}, function(err){
+    if(err) return res.json(err);
+    res.redirect('/');
+  });
+});
 
 module.exports = router;
 
